@@ -1,0 +1,5 @@
+DB:
+  url: "127.0.0.1:27019"
+  username: "admin"
+  passwd: "password"
+  dbName: "users"
