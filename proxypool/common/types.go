@@ -10,10 +10,10 @@ type IPGeter interface {
 type IPSaver interface {
 	SaveIp(value string, score int) bool
 	DeleteIp(ip string)
-	Getip() string
+	GetIp() string
 }
 
 // IPDetecter 是测试模块的接口
 type IPDetecter interface {
-	TestIP(ip string)
+	TestIp(ip string)
 }
