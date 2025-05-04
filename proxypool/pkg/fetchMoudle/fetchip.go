@@ -1,4 +1,4 @@
-package fetchmoudle
+package fetchMoudle
 
 import (
 	"fmt"
