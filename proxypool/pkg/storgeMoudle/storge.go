@@ -24,12 +24,33 @@ func NewStorge() *storgeMoudle {
 }
 
 func (s *storgeMoudle) SaveIp(value string, score float64) bool {
-	err := s.redis.Rdb.ZAdd(s.redis.Ctx, s.setname, redis.Z{Score: score, Member: value}).Err()
-	if err != nil {
-		fmt.Println(err)
-		return false
+	if score < 0 { // 传入的score<0 说明要减分了，顺便删除为0的
+		// 先获取之前的score
+		originScore, _ := s.redis.Rdb.ZScore(s.redis.Ctx, s.setname, value).Result()
+		if originScore <= 0 {
+			// 当分数已经为0时,则直接删除
+			_, err := s.redis.Rdb.ZRem(s.redis.Ctx, s.setname, value).Result()
+			if err != nil {
+				log.Println("[❌] 数据库错误")
+				return false
+			}
+		} else {
+			// 做减分操作
+			err := s.redis.Rdb.ZAdd(s.redis.Ctx, s.setname, redis.Z{Score: originScore + score, Member: value}).Err()
+			if err != nil {
+				fmt.Println(err)
+				return false
+			}
+		}
+		return true
+	} else { // 如何传入的score>0说明是加分:第一次存或者是检测后给100
+		err := s.redis.Rdb.ZAdd(s.redis.Ctx, s.setname, redis.Z{Score: score, Member: value}).Err()
+		if err != nil {
+			fmt.Println(err)
+			return false
+		}
+		return true
 	}
-	return true
 }
 
 /**

@@ -29,7 +29,7 @@ type IPStorger interface {
 	// api获取代理
 	GetIp() string
 
-	GetSomeIp(start float64, end float64) []string
+	GetSomeIp(start int64, end int64) []string
 }
 
 // IPDetecter 是测试模块的接口

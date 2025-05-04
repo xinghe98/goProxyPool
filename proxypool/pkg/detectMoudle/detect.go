@@ -13,19 +13,24 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/xinghe98/goProxyPool/common"
 )
 
-type DetectIP struct{}
+type DetectIP struct {
+	ipstorge common.IPStorger
+}
 
 // 初始化校验器
-func NewDetect() DetectIP {
-	return DetectIP{}
+func NewDetect(storge common.IPStorger) *DetectIP {
+	return &DetectIP{
+		ipstorge: storge,
+	}
 }
 
 // 并发测试ip可用性
 func (d *DetectIP) TestIp(ip []string) {
 	workerCount := runtime.NumCPU()
-	var wg sync.WaitGroup
+	var wg *sync.WaitGroup
 	taskChan := make(chan string, len(ip))
 	// 1. 启动worker检测器
 	for range workerCount {
@@ -50,17 +55,17 @@ func (d *DetectIP) TestIp(ip []string) {
 
 func (d *DetectIP) checkWorker(taskChan <-chan string) {
 	for ip := range taskChan {
-		// log.Printf("正在检测ip：%s", ip)
-		res, _ := d.fetchCheckUrl(ip)
-		if res {
-			log.Println("ip可用")
+		res, _ := d.requestCheckUrl(ip)
+		if !res {
+			log.Printf("❌IP: %s,不可用", ip)
+			d.ipstorge.SaveIp(ip, -10)
 		} else {
-			log.Println("ip不可用")
+			d.ipstorge.SaveIp(ip, 100)
 		}
 	}
 }
 
-func (d *DetectIP) fetchCheckUrl(proxyip string) (bool, error) {
+func (d *DetectIP) requestCheckUrl(proxyip string) (bool, error) {
 	testurl := viper.GetString("checkurl")
 	ip, _ := url.Parse(fmt.Sprintf("http://%s", proxyip))
 	client := &http.Client{
@@ -73,6 +78,6 @@ func (d *DetectIP) fetchCheckUrl(proxyip string) (bool, error) {
 	}
 	defer res.Body.Close()
 	body, _ := io.ReadAll(res.Body)
-	log.Printf("🦞IP：%s,检测返回：%s", proxyip, string(body))
+	log.Printf("✅ IP：%s,检测返回：%s", proxyip, string(body))
 	return true, nil
 }
