@@ -1,4 +1,4 @@
-package detectmoudle
+package detectMoudle
 
 type detectIP struct{}
 

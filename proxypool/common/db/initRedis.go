@@ -9,26 +9,35 @@ import (
 	"github.com/spf13/viper"
 )
 
-// 直接声明一个全局的数据库操作对象
-var (
+type Redis struct {
 	Rdb *redis.Client
-	Ctx = context.Background()
-)
+	Ctx context.Context
+}
 
-func InitRedis() {
+func NewRedisClient() *Redis {
+	rdb, ctx := initRedis()
+	return &Redis{
+		Rdb: rdb,
+		Ctx: ctx,
+	}
+}
+
+func initRedis() (*redis.Client, context.Context) {
 	passwd := viper.GetString("DB.passwd")
 	url := viper.GetString("DB.url")
+	ctx := context.Background()
 
-	Rdb = redis.NewClient(&redis.Options{
+	rdb := redis.NewClient(&redis.Options{
 		Addr:     url,
 		Password: passwd,
 		DB:       0,
 	})
 	// 测试连接
-	_, err := Rdb.Ping(Ctx).Result()
+	_, err := rdb.Ping(ctx).Result()
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
 	}
 	log.Println("redis连接成功") // 输出: PONG
+	return rdb, ctx
 }
