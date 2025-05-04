@@ -30,7 +30,7 @@ func NewDetect(storge common.IPStorger) *DetectIP {
 // 并发测试ip可用性
 func (d *DetectIP) TestIp(ip []string) {
 	workerCount := runtime.NumCPU()
-	var wg *sync.WaitGroup
+	var wg sync.WaitGroup
 	taskChan := make(chan string, len(ip))
 	// 1. 启动worker检测器
 	for range workerCount {
