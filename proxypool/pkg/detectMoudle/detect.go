@@ -2,6 +2,7 @@ package detectMoudle
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -49,13 +50,17 @@ func (d *DetectIP) TestIp(ip []string) {
 
 func (d *DetectIP) checkWorker(taskChan <-chan string) {
 	for ip := range taskChan {
-		log.Printf("正在检测ip：%s", ip)
-		res := d.fetchCheckUrl(ip)
-		fmt.Println(res)
+		// log.Printf("正在检测ip：%s", ip)
+		res, _ := d.fetchCheckUrl(ip)
+		if res {
+			log.Println("ip可用")
+		} else {
+			log.Println("ip不可用")
+		}
 	}
 }
 
-func (d *DetectIP) fetchCheckUrl(proxyip string) string {
+func (d *DetectIP) fetchCheckUrl(proxyip string) (bool, error) {
 	testurl := viper.GetString("checkurl")
 	ip, _ := url.Parse(fmt.Sprintf("http://%s", proxyip))
 	client := &http.Client{
@@ -64,15 +69,10 @@ func (d *DetectIP) fetchCheckUrl(proxyip string) string {
 	req, _ := http.NewRequest("GET", testurl, nil)
 	res, err := client.Do(req)
 	if err != nil {
-		return err.Error()
-	}
-	// 检查响应状态码
-	if res.StatusCode != http.StatusOK {
-		log.Fatal("非200响应:", res.Status)
-		return ""
+		return false, errors.New("访问错误")
 	}
 	defer res.Body.Close()
-	fmt.Println("status code:", res.StatusCode) // 获取状态码
 	body, _ := io.ReadAll(res.Body)
-	return string(body)
+	log.Printf("🦞IP：%s,检测返回：%s", proxyip, string(body))
+	return true, nil
 }
