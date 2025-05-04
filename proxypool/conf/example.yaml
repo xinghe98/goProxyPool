@@ -1,5 +1,8 @@
 DB:
   url: "127.0.0.1:27019"
-  username: "admin"
-  passwd: "password"
-  dbName: "users"
+  passwd: "admin"
+  set: "zset"
+
+ipurl: http://v2.api.juliangip.com/company/postpay/getips?auto_white=1&num=3&pt=1&result_type=text&split=2&trade_no=6390950011379080&sign=3651a6d2502a1f78b899568b6ef3df7e
+
+checkurl: http://v2.api.juliangip.com/v2/dps/ip_search

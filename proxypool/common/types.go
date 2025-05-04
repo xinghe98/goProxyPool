@@ -17,7 +17,7 @@ type IPStorger interface {
 	  首次储存的时候分数为20
 	  首次测试成功增加分数至100,或测试出现问题的扣分的方法
 	*/
-	SaveIp(value string, score int) bool
+	SaveIp(value string, score float64) bool
 
 	/**
 	 *
@@ -28,9 +28,11 @@ type IPStorger interface {
 
 	// api获取代理
 	GetIp() string
+
+	GetSomeIp(start float64, end float64) []string
 }
 
 // IPDetecter 是测试模块的接口
 type IPDetecter interface {
-	TestIp(ip string)
+	TestIp(ip []string)
 }
