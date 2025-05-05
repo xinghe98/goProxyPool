@@ -81,3 +81,13 @@ func (d *DetectIP) requestCheckUrl(proxyip string) (bool, error) {
 	log.Printf("✅ IP：%s,检测返回：%s", proxyip, string(body))
 	return true, nil
 }
+
+// 检测器
+func Run(detecter common.IPDetecter, storge common.IPStorger) {
+	go func(detecter common.IPDetecter) {
+		// 取总ip数
+		count := storge.GetCount()
+		res := storge.GetSomeIp(0, int64(count))
+		detecter.TestIp(res)
+	}(detecter)
+}

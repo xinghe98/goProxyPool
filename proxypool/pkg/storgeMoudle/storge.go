@@ -3,6 +3,7 @@ package storgeMoudle
 import (
 	"fmt"
 	"log"
+	"math/rand"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
@@ -53,17 +54,17 @@ func (s *storgeMoudle) SaveIp(value string, score float64) bool {
 	}
 }
 
-/**
- *
- * @param member
- * 当分数降为0时，删除该元素
- */
-func (s *storgeMoudle) DeleteIp(ip string) {
-}
-
 // api获取代理
-func (s *storgeMoudle) GetIp() string {
-	return ""
+func (s *storgeMoudle) GetIp() (string, error) {
+	ips, err := s.redis.Rdb.ZRevRangeByScore(s.redis.Ctx, s.setname, &redis.ZRangeBy{Min: "100", Max: "100"}).Result()
+	if err != nil {
+		return "", err
+	}
+	if len(ips) == 0 {
+		return "", err
+	}
+	ip := ips[rand.Intn(len(ips))]
+	return ip, nil
 }
 
 // 获取任意数量的ip

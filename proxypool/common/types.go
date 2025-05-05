@@ -19,17 +19,12 @@ type IPStorger interface {
 	*/
 	SaveIp(value string, score float64) bool
 
-	/**
-	 *
-	 * @param member
-	 * 当分数降为0时，删除该元素
-	 */
-	DeleteIp(ip string)
-
 	// api获取代理
-	GetIp() string
+	GetIp() (string, error)
 
 	GetSomeIp(start int64, end int64) []string
+
+	GetCount() int
 }
 
 // IPDetecter 是测试模块的接口

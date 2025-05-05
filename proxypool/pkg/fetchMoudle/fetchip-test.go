@@ -13,3 +13,6 @@ func NewFetchTest(url string) fetchIpTest {
 func (f *fetchIpTest) GetIps() []string {
 	return []string{}
 }
+
+func (f *fetchIpTest) Run() {
+}
