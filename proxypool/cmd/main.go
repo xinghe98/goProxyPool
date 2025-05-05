@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/viper"
 	"github.com/xinghe98/goProxyPool/common"
+	"github.com/xinghe98/goProxyPool/pkg/apiMoudle"
 	"github.com/xinghe98/goProxyPool/pkg/detectMoudle"
 	"github.com/xinghe98/goProxyPool/pkg/fetchMoudle"
 	"github.com/xinghe98/goProxyPool/pkg/storgeMoudle"
@@ -19,6 +20,9 @@ func main() {
 
 	// 初始化检测器
 	detecter := detectMoudle.NewDetect(storge)
+
+	// 初始化httpapi
+	api := apiMoudle.New("3000")
 
 	// 此处添加其他代理商获取ip
 	// getip := fetchMoudle.NewFetch(url)
@@ -38,7 +42,7 @@ func main() {
 		}(v)
 	}
 
-	// 检测器:每轮取50个检测
+	// 检测器
 	go func(detecter *detectMoudle.DetectIP) {
 		// 取总ip数
 		count := storge.GetCount()
@@ -46,5 +50,6 @@ func main() {
 		detecter.TestIp(res)
 	}(detecter)
 
-	select {}
+	// 启动gin服务器
+	api.Run()
 }

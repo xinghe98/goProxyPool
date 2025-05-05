@@ -36,3 +36,8 @@ type IPStorger interface {
 type IPDetecter interface {
 	TestIp(ip []string)
 }
+
+// IPApier 是对外调用模块的接口
+type IPApier interface {
+	Run()
+}
