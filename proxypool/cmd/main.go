@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"math"
 
 	"github.com/spf13/viper"
 	"github.com/xinghe98/goProxyPool/common"
@@ -43,11 +42,8 @@ func main() {
 	go func(detecter *detectMoudle.DetectIP) {
 		// 取总ip数
 		count := storge.GetCount()
-		for i := 0; i <= int(count); i += 50 {
-			end := math.Min(float64(i+50), float64(count))
-			res := storge.GetSomeIp(int64(i), int64(end))
-			detecter.TestIp(res)
-		}
+		res := storge.GetSomeIp(0, int64(count))
+		detecter.TestIp(res)
 	}(detecter)
 
 	select {}
